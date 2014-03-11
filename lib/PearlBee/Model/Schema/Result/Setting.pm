@@ -19,48 +19,56 @@ __PACKAGE__->table("settings");
 
 =head1 ACCESSORS
 
-=head2 user_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
 =head2 timezone
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 200
+  size: 255
+
+=head2 social_media
+
+  data_type: 'tinyint'
+  default_value: 1
+  is_nullable: 0
+
+=head2 blog_path
+
+  data_type: 'varchar'
+  default_value: '/'
+  is_nullable: 0
+  size: 255
+
+=head2 theme_folder
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
+=head2 blog_name
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
 
 =cut
 
 __PACKAGE__->add_columns(
-  "user_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "timezone",
-  { data_type => "varchar", is_nullable => 0, size => 200 },
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "social_media",
+  { data_type => "tinyint", default_value => 1, is_nullable => 0 },
+  "blog_path",
+  { data_type => "varchar", default_value => "/", is_nullable => 0, size => 255 },
+  "theme_folder",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "blog_name",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
 );
-__PACKAGE__->set_primary_key("user_id");
-
-=head1 RELATIONS
-
-=head2 user
-
-Type: belongs_to
-
-Related object: L<Model::Schema::Result::User>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  "user",
-  "Model::Schema::Result::User",
-  { id => "user_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+__PACKAGE__->set_primary_key("timezone", "social_media", "blog_path");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-01-20 11:27:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z/hCtn7dtRQ5klO++DNKiA
+# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-03-06 16:50:43
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:w62Hs9dC9yPBqU3YHClvKQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -29,13 +29,19 @@ __PACKAGE__->table("post");
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 200
+  size: 255
+
+=head2 slug
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
 
 =head2 description
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 200
+  size: 255
 
 =head2 cover
 
@@ -74,9 +80,11 @@ __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "title",
-  { data_type => "varchar", is_nullable => 0, size => 200 },
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "slug",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
   "description",
-  { data_type => "varchar", is_nullable => 1, size => 200 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "cover",
   { data_type => "varchar", is_nullable => 0, size => 300 },
   "content",
@@ -106,13 +114,13 @@ __PACKAGE__->set_primary_key("id");
 
 Type: has_many
 
-Related object: L<Model::Schema::Result::Comment>
+Related object: L<PearlBee::Model::Schema::Result::Comment>
 
 =cut
 
 __PACKAGE__->has_many(
   "comments",
-  "Model::Schema::Result::Comment",
+  "PearlBee::Model::Schema::Result::Comment",
   { "foreign.post_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -121,13 +129,13 @@ __PACKAGE__->has_many(
 
 Type: belongs_to
 
-Related object: L<Model::Schema::Result::User>
+Related object: L<PearlBee::Model::Schema::Result::User>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "user",
-  "Model::Schema::Result::User",
+  "PearlBee::Model::Schema::Result::User",
   { id => "user_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
@@ -136,13 +144,13 @@ __PACKAGE__->belongs_to(
 
 Type: has_many
 
-Related object: L<Model::Schema::Result::PostCategory>
+Related object: L<PearlBee::Model::Schema::Result::PostCategory>
 
 =cut
 
 __PACKAGE__->has_many(
   "post_categories",
-  "Model::Schema::Result::PostCategory",
+  "PearlBee::Model::Schema::Result::PostCategory",
   { "foreign.post_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -151,20 +159,20 @@ __PACKAGE__->has_many(
 
 Type: has_many
 
-Related object: L<Model::Schema::Result::PostTag>
+Related object: L<PearlBee::Model::Schema::Result::PostTag>
 
 =cut
 
 __PACKAGE__->has_many(
   "post_tags",
-  "Model::Schema::Result::PostTag",
+  "PearlBee::Model::Schema::Result::PostTag",
   { "foreign.post_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-01-27 14:32:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Yyy4JWqVvkqd9yEFN0A3tw
+# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-02-07 19:20:20
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o8AORcJ8sKoBZ7dZIuEpMw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
@@ -178,13 +186,13 @@ Get the number of comments for this post
 sub nr_of_comments {
   my ($self) = @_;
 
-  my @post_comments = $self->comments;    
+  my @post_comments = $self->comments;
   my @comments = grep { $_->status eq 'approved' } @post_comments;
 
-  return scalar @comments; 
+  return scalar @comments;
 }
 
-=head 
+=head
 
 Get all tags as a string sepparated by a comma
 
@@ -200,6 +208,49 @@ sub get_string_tags {
   my $joined_tags = join(', ', @tag_names);
 
   return $joined_tags;
+}
+
+=head 
+
+Status updates
+
+=cut
+
+sub publish {
+  my ($self, $user) = @_;
+
+  $self->update({ status => 'published' }) if ( $self->is_authorized( $user ) );
+}
+
+sub draft {
+  my ($self, $user) = @_;
+
+  $self->update({ status => 'draft' }) if ( $self->is_authorized( $user ) );
+}
+
+
+sub trash {
+  my ($self, $user) = @_;
+
+  $self->update({ status => 'trash' }) if ( $self->is_authorized( $user ) );
+}
+
+=haed
+
+Check if the user has enough authorization for modifying
+
+=cut
+
+sub is_authorized {
+  my ($self, $user) = @_;
+
+  my $schema     = $self->result_source->schema;
+  $user          = $schema->resultset('User')->find( $user->{id} );
+  my $authorized = 0;
+  $authorized    = 1 if ( $user->is_admin );
+  $authorized    = 1 if ( !$user->is_admin && $self->user_id == $user->id );
+
+  return $authorized;
 }
 
 1;

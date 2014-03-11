@@ -36,12 +36,14 @@ plugins:
         default:
           dsn: dbi:mysql:PearlBee
           schema_class: PearlBee::Model::Schema
-          user: root
-          pass: dev
+          user: username
+          pass: password
           options:
             RaiseError: 1
             PrintError: 1
 
 # Constants
-captcha_folder : 'public/captcha/'
-covers_folder: 'public/uploads/covers/'
+captcha_folder :  'public/captcha/'
+covers_folder:    'public/uploads/covers/'
+app_url:          'http://localhost:5000'
+email_templates:  'views/emails/'

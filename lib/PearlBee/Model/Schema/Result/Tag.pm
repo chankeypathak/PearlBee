@@ -55,20 +55,20 @@ __PACKAGE__->set_primary_key("id");
 
 Type: has_many
 
-Related object: L<Model::Schema::Result::PostTag>
+Related object: L<PearlBee::Model::Schema::Result::PostTag>
 
 =cut
 
 __PACKAGE__->has_many(
   "post_tags",
-  "Model::Schema::Result::PostTag",
+  "PearlBee::Model::Schema::Result::PostTag",
   { "foreign.tag_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-01-25 12:52:05
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:moMYurx46wdDCY7InMFnjA
+# Created by DBIx::Class::Schema::Loader v0.07010 @ 2014-02-07 19:20:20
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0+XDbJ+5QHIE9J3C89XhNg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
